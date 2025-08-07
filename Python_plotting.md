@@ -128,3 +128,101 @@ plt.show()
 ```
 
 
+## Advanced plot with Plotly
+
+```python
+import plotly.graph_objects as go
+
+# Recreate the sine and cosine plots with Plotly
+x = np.linspace(0, 2 * np.pi, 400)
+y_sin = np.sin(x)
+y_cos = np.cos(x)
+
+fig = go.Figure()
+
+fig.add_trace(go.Scatter(x=x, y=y_sin, mode='lines', name='sin(x)'))
+fig.add_trace(go.Scatter(x=x, y=y_cos, mode='lines', name='cos(x)'))
+
+fig.update_layout(
+    title='Interactive Sine and Cosine Functions with Plotly',
+    xaxis_title='x',
+    yaxis_title='f(x)',
+    legend_title='Functions',
+    hovermode='x unified'
+)
+
+fig.show()
+
+```
+
+## Interactive plots and Animations
+
+```python
+import numpy as np
+import plotly.graph_objects as go
+
+# Create grid
+x = np.linspace(-10, 10, 50)
+y = np.linspace(-10, 10, 50)
+x_grid, y_grid = np.meshgrid(x, y)
+
+# Create frames for each value of k
+frames = []
+k_values = np.linspace(0, 10, 40)
+
+for k in k_values:
+    z =np.abs(np.sqrt(x_grid**2 + y_grid**2) -k)
+    surface = go.Surface(z=z, x=x_grid, y=y_grid, colorscale='viridis')
+    frames.append(go.Frame(data=[surface], name=f'{k:.2f}'))
+
+# Initial surface (for first frame)
+z0 = np.sin(np.sqrt(x_grid**2 + y_grid**2) - k_values[0])
+surface0 = go.Surface(z=z0, x=x_grid, y=y_grid, colorscale='viridis')
+
+# Create figure with initial frame and all other frames
+fig = go.Figure(
+    data=[surface0],
+    frames=frames,
+    layout=go.Layout(
+        title='Animated 3D Surface Plot with Varying k',
+        scene=dict(
+            xaxis_title='x',
+            yaxis_title='y',
+            zaxis_title='z'
+        ),
+        updatemenus=[
+            dict(
+                type="buttons",
+                showactive=False,
+                buttons=[
+                    dict(label="Play",
+                         method="animate",
+                         args=[None, {"frame": {"duration": 100, "redraw": True},
+                                      "fromcurrent": True}]),
+                    dict(label="Pause",
+                         method="animate",
+                         args=[[None], {"frame": {"duration": 0, "redraw": False},
+                                        "mode": "immediate",
+                                        "transition": {"duration": 0}}])
+                ]
+            )
+        ],
+        sliders=[{
+            "steps": [
+                {"method": "animate", "args": [[f'{k:.2f}'],
+                 {"mode": "immediate", "frame": {"duration": 0, "redraw": True}, "transition": {"duration": 0}}],
+                 "label": f'{k:.2f}'}
+                for k in k_values
+            ],
+            "transition": {"duration": 0},
+            "x": 0,
+            "y": -0.1,
+            "currentvalue": {"prefix": "k: "}
+        }]
+    )
+)
+
+fig.show()
+```
+
+
